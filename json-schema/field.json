@@ -1,0 +1,27 @@
+{
+  "$id": "./field.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Taskly Field",
+  "description": "Definition of the taskly field type",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Field name",
+      "type": "string"
+    },
+    "type": {
+      "description": "Field type",
+      "type": "string",
+      "enum": ["string", "double", "boolean", "integer", "date"]
+    },
+    "readOnly": {
+      "description": "Mutability of field",
+      "type": "boolean"
+    },
+    "required": {
+      "description": "Required status field",
+      "type": "boolean"
+    }
+  },
+  "required": [ "name", "type" ]
+}

@@ -1,0 +1,35 @@
+{
+  "$id": "./entity.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Taskly Entity",
+  "description": "Definition of the taskly entity type",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Friendly name of the entity type",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "Globally unique identifier for an entity, guid string",
+      "type": "string"
+    },
+    "id": {
+      "description": "Numeric identifier of entity, unique by entity type",
+      "type": "number"
+    },
+    "version": {
+      "description": "Semantic version number of entity",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Array of schemas defining the entity's fields",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }    
+  },
+  "required": [ "name", "id", "uuid", "version", "fields" ]
+}
