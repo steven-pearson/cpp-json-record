@@ -5,7 +5,7 @@
 
 TEST(RecordTestSuite, simpleRecord)
 {
-  taskly::Record subject();
+  taskly::Record subject;
   
   //EXPECT_EQ(add(2, 2), 4) << "The add is not correct using double inputs";
 }

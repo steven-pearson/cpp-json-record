@@ -21,6 +21,8 @@
 #include <iostream>
 // LCOV_EXCL_STOP
 
+#include "Variant.h"
+
 namespace taskly {
     typedef size_t EventHandlerID;
     
@@ -63,65 +65,37 @@ namespace taskly {
         const bool _cancellable;
     };
 
-    class NotifyPropertyChangingEventArgs : public EventArgs{
-        
-    public:
-        NotifyPropertyChangingEventArgs(const std::string& name) :
-            EventArgs(true),
-            _name(name) {
-        }
-        
-        const std::string& name() const { return _name; }
-        
-    private:
-        const std::string& _name;
-    };
-
-    class NotifyPropertyChangedEventArgs : public EventArgs {
-        
-    public:
-        NotifyPropertyChangedEventArgs(const std::string& name) : _name(name) {
-        }
-        
-        const std::string& name() const { return _name; }
-        
-    private:
-        const std::string& _name;
-    };
-
-    template<typename ParamT>
     class PropertyChangingEventArgs : public EventArgs {
         
     public:
-        PropertyChangingEventArgs(const ParamT& proposedValue, const std::string& name) :
+        PropertyChangingEventArgs(const Variant& proposedValue, const std::string& name) :
             EventArgs(true),
             _name(name),
             _proposedValue(proposedValue) {
         }
         
         const std::string& name() const { return _name; }
-        const ParamT& proposedValue() const { return _proposedValue; }
+        const Variant& proposedValue() const { return _proposedValue; }
 
     private:
         const std::string& _name;
-        const ParamT& _proposedValue;
+        const Variant& _proposedValue;
     };
 
-    template<typename ParamT>
     class PropertyChangedEventArgs : public EventArgs {
         
     public:
-        PropertyChangedEventArgs(const ParamT& newValue, const std::string& name) :
+        PropertyChangedEventArgs(const Variant& newValue, const std::string& name) :
             _name(name),
             _newValue(newValue) {
         }
         
         const std::string& name() const { return _name; }
-        const ParamT& newValue() const { return _newValue; }
+        const Variant& newValue() const { return _newValue; }
 
     private:
         const std::string& _name;
-        const ParamT& _newValue;
+        const Variant& _newValue;
     };
 
     template<typename ParamT>

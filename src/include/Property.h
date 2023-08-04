@@ -21,23 +21,28 @@
 #include <functional>
 // LCOV_EXCL_STOP
 
+#include "Variant.h"
+
 #ifdef _MSC_VER
 #pragma pack(push, 1)
 #endif
 
 namespace taskly {
 
+    typedef EventBase<PropertyChangingEventArgs> PropertyChanging;
+    typedef EventBase<PropertyChangedEventArgs> PropertyChanged;
+
     class INotifyPropertyChange {
     public:
-        EventBase<NotifyPropertyChangingEventArgs> Changing;
-        EventBase<NotifyPropertyChangedEventArgs> Changed;
+        PropertyChanging Changing;
+        PropertyChanged Changed;
 
     public:
-        virtual void OnChanging(NotifyPropertyChangingEventArgs& args) const {
+        virtual void OnChanging(PropertyChangingEventArgs& args) const {
             Changing.Notify(args);
         }
 
-        virtual void OnChanged(NotifyPropertyChangedEventArgs& args) const {
+        virtual void OnChanged(PropertyChangedEventArgs& args) const {
             Changed.Notify(args);
         }
     };
@@ -55,12 +60,14 @@ namespace taskly {
         const std::string _name;
     };
 
-    template <typename TValueType>
     class Property : public PropertyBase {
 
+    private:
+        const Variant _defaultValue;
+
     public:
-        typedef std::function<TValueType()> Getter;
-        typedef std::function<void(TValueType)> Setter;
+        typedef Variant&(*Getter)();
+        typedef void (*Setter)(Variant&);
 
         Property(const char* name, INotifyPropertyChange* container, Getter getter, Setter setter = NULL) : PropertyBase(name) {
             _container = container;
@@ -73,10 +80,10 @@ namespace taskly {
 #pragma warning (disable : 4181 )
 #endif
         //-- Overload the = operator to set the value using the set member --
-        void operator =(TValueType value) {
+        void operator =(Variant value) {
             if (_set != NULL) {
                 bool propertyChanging = true;
-                TValueType oldValue = _get();
+                auto oldValue = _get();
 
                 propertyChanging = (oldValue != value);
 
@@ -90,7 +97,7 @@ namespace taskly {
 #pragma warning (pop)
 #endif
         //-- Cast the property class to the internal type --
-        operator TValueType() {
+        operator Variant() {
             try {
                 return _get != NULL ? _get() : DefaultGetter();
             }
@@ -99,32 +106,30 @@ namespace taskly {
             }
         }
         
-        const TValueType DefaultGetter() const {
-            return TValueType(NULL);
+        const Variant& DefaultGetter() const {
+            return _defaultValue;
         }
         
-        EventBase<PropertyChangingEventArgs<TValueType>> Changing;
+        PropertyChanging Changing;
         
-        EventBase<PropertyChangedEventArgs<TValueType>> Changed;
+        PropertyChanged Changed;
         
-        const bool OnChanging(const TValueType &proposedValue) {
+        const bool OnChanging(const Variant &proposedValue) {
+            PropertyChangingEventArgs args(proposedValue, name());
             if (_container) {
-                NotifyPropertyChangingEventArgs args(name());
                 _container->OnChanging(args);
                 if (args.cancelled()) {
                     return false;
                 }
             }
-            PropertyChangingEventArgs<TValueType> notifyArgs(proposedValue, name());
-            return Changing.Notify(notifyArgs);
+            return Changing.Notify(args);
         }
         
-        const bool OnChanged(const TValueType &newValue) {
-            PropertyChangedEventArgs<TValueType> args(newValue, name());
+        const bool OnChanged(const Variant &newValue) {
+            PropertyChangedEventArgs args(newValue, name());
             Changed.Notify(args);
             if (_container) {
-                NotifyPropertyChangedEventArgs notifyArgs(name());
-                _container->OnChanged(notifyArgs);
+                _container->OnChanged(args);
             }
             return true;
         }
