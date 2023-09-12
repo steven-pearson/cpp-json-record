@@ -5,12 +5,6 @@
 
 TEST(RecordTestSuite, simpleRecord)
 {
+  std::cout << "RecordTestSuite";
   taskly::Record subject;
-  
-  //EXPECT_EQ(add(2, 2), 4) << "The add is not correct using double inputs";
-}
-
-int main(int argc, char **argv) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }
